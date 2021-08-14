@@ -17,6 +17,13 @@ enum XlInputTableRow {
 	MAILID		= 6
 }
 
+enum XlInputCheckURL {
+	checking	= 0
+	checked		= 1
+	failed		= 2
+}
+
+
 # XlInput classと呼び出し側でやりとりするデータ型の定義
 class XlInputTableData:ICloneable
 {
@@ -152,7 +159,8 @@ class XlInput
 
 
 	# 入力元の仕様書更新履歴Tableから、引数keyで絞り込んだ結果の仕様書格納先URLリストを取得
-	[XlInputTableData[]]readFilterData( [string]$filterkey ) {		# filterkey == category
+	[XlInputTableData[]]readFilterData( [string]$filterkey )		# filterkey == category
+	{
 
 		Write-Host "$filterkey に対して情報更新します。"
 
@@ -200,7 +208,7 @@ class XlInput
 			$oneLineData.MailID		= $_.Cells([XlInputTableRow]::MAILID).Value()
 			$oneLineData.absoluteRowPosition = $_.Cells(0).Row + 1		# Table開始行はヘッダ部のため、+1している
 
-			if( "checked" -ne $oneLineData.URLcheck ){
+			if( $oneLineData.URLcheck -ne [string][XlInputCheckURL]::checked ){
 				debugOut -g1 "情報取得先：" -w2 "$($oneLineData.URL)"
 				$outlist += $oneLineData.Clone()	# 仕様書取得先URL一覧の最後尾に1件追加
 			}
@@ -222,5 +230,14 @@ class XlInput
 		$absoluteCol = $tableTopCol + [XlInputTableRow]::URLCHECK
 
 		$this.inputWksheet.cells( $absoluteRow, $absoluteCol ).Value = $strData
+	}
+
+
+	# Autofilterを解除する
+	[void]RemoveAutofilter()
+	{
+		if( $null -eq $this.inputWksheet.AutoFilter ){ return }
+
+		$this.inputWksheet.AutoFilter.ShowAllData()
 	}
 }

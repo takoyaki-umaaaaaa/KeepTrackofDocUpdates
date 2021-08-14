@@ -11,16 +11,19 @@ Using module .\XlInputManager.psm1
 Using module .\XlOutputManager.psm1
 Import-Module -Name $PSScriptRoot\OutputMessage.psm1
 
+# 設定ファイル読み込み (Scriptと同じディレクトリ)
+if( -not (Test-Path "$PSScriptRoot\Settings.json") ) { Write-Host -ForegroundColor Red "設定ファイル(Settings.json)がありません"; exit -1}
+$SettingsJson = (Get-Content "$PSScriptRoot\Settings.json" -Encoding UTF8 -Raw | ConvertFrom-Json)
 
 # 入力 Excelファイル
-[string]$xlInputFileName = "$PSScriptRoot\resource\更新履歴.xlsx"
-[string]$xlInputSheetName = "Sheet1"		# 更新履歴情報が記載された sheet名
-[string]$xlInputTableName = "テーブル2"		# 更新履歴情報が記載された Table名
+[string]$xlInputFileName = $SettingsJson.InputExcelFile
+[string]$xlInputSheetName = $SettingsJson.InputExcelSheet		# 更新履歴情報が記載された sheet名
+[string]$xlInputTableName = $SettingsJson.InputExcelTable		# 更新履歴情報が記載された Table名
 # 出力 Excelファイル
-[string]$xlOutputFileName = "$PSScriptRoot\resource\最新資料情報.xlsx"
+[string]$xlOutputFileName = $SettingsJson.OutputExcelFile
 
-if( -not (Test-Path $xlInputFileName) ) { Write-Host -ForegroundColor Red "xlInputFileName に設定されたファイルが見つかりません。パスを見直してください。"; exit -1}
-if( -not (Test-Path $xlOutputFileName) ){ Write-Host -ForegroundColor Red "xlOutputFileName に設定されたファイルが見つかりません。パスを見直してください。"; exit -1}
+if( -not (Test-Path -LiteralPath $xlInputFileName) ) { Write-Host -ForegroundColor Red "Settings.jsonに記載の読み込みファイル($xlInputFileName)が見つかりません。パスを見直してください。"; exit -1}
+if( -not (Test-Path -LiteralPath $xlOutputFileName) ){ Write-Host -ForegroundColor Red "Settings.jsonに記載の書き込みファイル($xlOutputFileName)が見つかりません。パスを見直してください。"; exit -1}
 
 
 
@@ -62,20 +65,20 @@ foreach ($cate in $categoryKeyList) {
 		$listdata | ForEach-Object {
 			Write-Host "`n------------"
 			Write-Host "$($_.URL) を処理します"
-			$excelInput.writeURLCheckStatus( "checking...", $_ ); $excelInput.Save()
+			$excelInput.writeURLCheckStatus( [string][XlInputCheckURL]::checking, $_ ); $excelInput.Save()
 
 
 			# 入力元 file から入手した URLにアクセスし、仕様書リストを取得
 			[string[]]$filenameList = $excelOutput.getFilelistFromURL( $($_.URL) ) 
 
 			if( ($filenameList | Measure-Object).count -gt 0 ){ # 0件の場合は $filenameListに $null が入るため、そのままではメソッドが使えないための回避策
-				$excelInput.writeURLCheckStatus( "checked", $_ ); $excelInput.Save()
+				$excelInput.writeURLCheckStatus( [string][XlInputCheckURL]::checked, $_ ); $excelInput.Save()
 
 				# 仕様書リストを出力先 Excel file に書き込み
 				$excelOutput.writeListToExcelFile( $filenameList, $cate )
 			}
 			else {
-				$excelInput.writeURLCheckStatus( "failed", $_ ); $excelInput.Save()
+				$excelInput.writeURLCheckStatus( [string][XlInputCheckURL]::failed, $_ ); $excelInput.Save()
 
 				# エラーによるリスト取得失敗や、そもそもファイルが1件もない場合は処理を抜けて次のURLへ
 				errlog "file list が 0件のため出力処理をスキップ - $cate :対象URL :  $($_.URL)"
@@ -91,6 +94,9 @@ foreach ($cate in $categoryKeyList) {
 	}
 }
 
+
+$excelInput.RemoveAutofilter()		# Auto filter解除(解除可能な場合のみ)
+$excelInput.Save()
 $excelInput.Quit()
 $excelOutput.Save()
 $excelOutput.Quit()
