@@ -1,0 +1,2 @@
+# KeepTrackofDocUpdates
+ファイルの更新履歴一覧から、最新資料の Versionと場所を追跡する
