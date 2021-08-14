@@ -1,0 +1,10 @@
+;Mode=RegexReplace
+;RegexOption=i
+;Title=PowerShell
+
+^\s*(function)\s+([^\s\({]+) /// $2() /// FUNC,Level=1
+
+^\s*(for)\s*(\(.+$) /// $1 $2 /// LOOP,Level=2
+^\s*(foreach)\s*(\(.+$) /// $1 $2 /// LOOP,Level=2
+^\s*(while)\s*(\(.+$) /// $1 $2 /// LOOP,Level=2
+^\s*(.+\sForEach-Object)\s*(.+$) /// $1 $2 /// LOOP,Level=2

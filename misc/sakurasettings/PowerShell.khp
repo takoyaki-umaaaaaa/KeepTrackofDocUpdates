@@ -1,0 +1,7 @@
+// キーワード辞書設定 Ver1
+eq,ieq,cep /// ＝
+ne,ine,cne /// ≠
+gt,igt,cgt /// ＞
+ge,ige,cge /// ≧
+lt,ilt,clt /// ＜
+le,ile,cle /// ≦

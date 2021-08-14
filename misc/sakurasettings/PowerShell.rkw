@@ -1,0 +1,8 @@
+﻿// 正規表現キーワード Ver1
+RxKey[000]=CMT,/(?#コメント)\#.*$/ki
+RxKey[001]=WQT,/(?#文字列)(?<sept>["'])(`.|.)*?\k<sept+0>/ki
+RxKey[002]=RK5,/(?#オブジェクト)\[(.*?)\]/ki
+RxKey[003]=RK3,/(?#演算子)\s\-(!|eq|ne|f|match|gt|lt|ge|le|e|w|r|bnot|band|bor|bxor|and|not|or)\s+/ki
+RxKey[004]=RK3,/(?#変数)\$(\$|\^|\?|_|input|matches|home|error|myinvocation|true|false|args)/ki
+RxKey[005]=RK4,/(?#変数)\$[a-z_]+[_\.\w]*(\:\:|\:)?([_\.\w]+(\.)?)?/ki
+RxKey[006]=NUM,/(?#数字)(\-)?(\.)?\d(\.(\d+?))?/ki
