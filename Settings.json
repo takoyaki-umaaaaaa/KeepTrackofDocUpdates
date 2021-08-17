@@ -1,6 +1,6 @@
 {
-	"InputExcelFile" : "D:\\work\\KeepTrackofDocUpdates\\resource\\更新履歴.xlsx",
-	"InputExcelSheet" : "Sheet1",
-	"InputExcelTable" : "テーブル2",
-	"OutputExcelFile" : "D:\\work\\KeepTrackofDocUpdates\\resource\\最新資料情報.xlsx"
+	"InputExcelFile": "D:\\work\\KeepTrackofDocUpdates\\resource\\更新履歴.xlsx",
+	"InputExcelSheet": "Sheet1",
+	"InputExcelTable": "テーブル2",
+	"OutputExcelFile": "D:\\work\\KeepTrackofDocUpdates\\resource\\最新資料情報.xlsx"
 }

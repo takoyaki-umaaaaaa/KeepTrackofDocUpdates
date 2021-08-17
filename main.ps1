@@ -22,8 +22,8 @@ $SettingsJson = (Get-Content "$PSScriptRoot\Settings.json" -Encoding UTF8 -Raw |
 # 出力 Excelファイル
 [string]$xlOutputFileName = $SettingsJson.OutputExcelFile
 
-if( -not (Test-Path -LiteralPath $xlInputFileName) ) { Write-Host -ForegroundColor Red "Settings.jsonに記載の読み込みファイル($xlInputFileName)が見つかりません。パスを見直してください。"; exit -1}
-if( -not (Test-Path -LiteralPath $xlOutputFileName) ){ Write-Host -ForegroundColor Red "Settings.jsonに記載の書き込みファイル($xlOutputFileName)が見つかりません。パスを見直してください。"; exit -1}
+if( -not (Test-Path -Path $xlInputFileName -PathType leaf ) ){ Write-Host -ForegroundColor Red "Settings.jsonに記載の読み込みファイル($xlInputFileName)が見つかりません。パスを見直してください。"; exit -1}
+if( -not (Test-Path -Path $xlOutputFileName -PathType leaf) ){ Write-Host -ForegroundColor Red "Settings.jsonに記載の書き込みファイル($xlOutputFileName)が見つかりません。パスを見直してください。"; exit -1}
 
 
 

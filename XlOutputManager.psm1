@@ -126,9 +126,15 @@ class XlOutput
 	# 引数の文字列を出力先Excelシートに書き込む
 	hidden [void] writeStringToExcelFile ( [string]$outName, [string]$cate )
 	{
-		# "Ver", "Rev" 以降の文字列を削除し、仕様書別に区分できる形にする
-		$specDocName = $outName -replace '(_*Ver|_*Rev).*$', $null
-		$TableNameToEdit = $this.CategoryStr + "_" + $specDocName		# Table名は [カテゴリ名_仕様書名] としている
+		# 出力先の Table名を作成 (Table名は [カテゴリ名_仕様書名] としている)
+		# まずはファイル名から「仕様書名」を切り出す
+		if( $outName -match '(Ver|Rev)' ){
+			$specDocName = $outName -replace '(_*Ver|_*Rev).*$', $null		# "Ver", "Rev" 以降の文字列を削除し、仕様書別に区分できる形にする
+		}
+		else {
+			$specDocName = [System.IO.Path]::GetFileNameWithoutExtension( $outName )
+		}
+		$TableNameToEdit = $this.CategoryStr + "_" + $specDocName		# 処理中のカテゴリ名 + 仕様書名 で 目的の書き込み先Table名を作成
 		$TableNameToEdit = $TableNameToEdit -replace '[- ]', '_'		# Table名に空白、ハイフンは使えないようなので
 		debugOut -g1 "テーブル名：[" -w1 "$TableNameToEdit" -g2 "] を探します"
 
@@ -172,7 +178,7 @@ class XlOutput
 	}
 
 
-	# 仕様書一覧Tableを作成
+	# Excel sheetに仕様書一覧Tableを作成
 	hidden [object]createExcelTbl( [string]$tableName, [ref]$wksheet )
 	{
 
@@ -223,15 +229,22 @@ class XlOutput
 	}
 
 
-	# 仕様書一覧Tableに1行追加
+	# Excel sheetの仕様書一覧Tableに1行追加
 	[void] addRowToExcelTbl( [string]$documentName, [object]$tableRange, [object]$row, [object]$col, [ref]$wksheet )
 	{
 		# ファイル名から Verを取得
-		[string]$ver = $documentName -replace '^.*?(?=(ver|rev))', $null
-		[int]$extIdx = $ver.LastIndexOf('.')  # 見つからなかったら -1
-		if ( $extIdx -gt 0 ) {
-			# idx 0 での match は対象外にしたい
-			$ver = $ver.Substring( 0, $extIdx )
+		if( $documentName -match '(Ver|Rev)' ){
+			[string]$ver = $documentName -replace '^.*?(?=(ver|rev))', $null
+			if( $ver -ne $null ){
+				[int]$extIdx = $ver.LastIndexOf('.')  # 見つからなかったら -1
+				if ( $extIdx -gt 0 ) {
+					# idx 0 での match は対象外にしたい
+					$ver = $ver.Substring( 0, $extIdx )
+				}
+			}
+		}
+		else {
+			$ver = ""		# ファイル名に Versionが無い場合、Versionについては何も出力しない
 		}
 
 		debugOut -g1 "1件追加：行=$row, 列=$col, 名称=$documentName, Ver=$ver"
